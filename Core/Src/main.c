@@ -92,10 +92,10 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   //------------------------------------------------------
-   GPIO_PinState SwitchState[2];  //Now, Previous
+   GPIO_PinState SwitchStateS1[2];  //Now, Previous
    uint16_t LED1_Half_Period = 1000;  //Half of 0.5 Hz
-   uint32_t TimeStamp = 0;	//
-   uint32_t ButtonTimeStamp = 0;
+   uint32_t TimeStamp_LED1 = 0;	//
+   uint32_t ButtonTimeStampS1 = 0;
 
   //------------------------------------------------------
   /* USER CODE END 2 */
@@ -104,50 +104,55 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-   if(HAL_GetTick() - ButtonTimeStamp >= 100)
+   if(HAL_GetTick() - ButtonTimeStampS1 >= 100)
    {
-    ButtonTimeStamp = HAL_GetTick();
+		ButtonTimeStampS1 = HAL_GetTick();
 
-    SwitchState[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
-       //Press = Low , No = High
-       if(SwitchState[0] == GPIO_PIN_SET && SwitchState[1] == GPIO_PIN_RESET)
-       // set = high , reset = low
-       {
-        //Change Half Period of LED 1
-        if(LED1_Half_Period == 1000)
-        {
-        	LED1_Half_Period = 500;	// 1 HZ
-        }
-        else if (LED1_Half_Period == 500)
-        {
-        	LED1_Half_Period = 250;	// 2 HZ
-		}
-        else if (LED1_Half_Period == 250)
-        {
-        	LED1_Half_Period = (1000/6);	// 3 HZ
-		}
-        else
-        {
-         LED1_Half_Period = 1000;	// 0.5 HZ
-        }
-       }
-       SwitchState[1] = SwitchState[0];
+		//	Task 1
+		SwitchStateS1[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
+		   //Press = Low , No = High
+		   if(SwitchStateS1[0] == GPIO_PIN_SET && SwitchStateS1[1] == GPIO_PIN_RESET)
+		   // set = high , reset = low
+		   {
+				//Change Half Period of LED 1
+				if(LED1_Half_Period == 1000)
+				{
+					LED1_Half_Period = 500;	// 1 HZ
+				}
+				else if (LED1_Half_Period == 500)
+				{
+					LED1_Half_Period = 250;	// 2 HZ
+				}
+				else if (LED1_Half_Period == 250)
+				{
+					LED1_Half_Period = (1000/6);	// 3 HZ
+				}
+				else
+				{
+				 LED1_Half_Period = 1000;	// 0.5 HZ
+				}
+		   }
+		   SwitchStateS1[1] = SwitchStateS1[0];
+
+		 //	Task 2
+
+
    }
 
 
 
-   //Run LED
-   if(HAL_GetTick() - TimeStamp >= LED1_Half_Period) //millisecond now time
+   //Run LED for Task 1
+   if(HAL_GetTick() - TimeStamp_LED1 >= LED1_Half_Period) //millisecond now time
    {
-    TimeStamp = HAL_GetTick();
-    if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET)
-    {
-     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
-    }
-    else
-    {
-     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
-    }
+		TimeStamp_LED1 = HAL_GetTick();
+		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET)
+		{
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+		}
+		else
+		{
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+		}
    }
 
 

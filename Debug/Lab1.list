@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0002000c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00005686  00000000  00000000  0002003c  2**0
+ 12 .debug_info   00005687  00000000  00000000  0002003c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_abbrev 000010d2  00000000  00000000  000256c2  2**0
+ 13 .debug_abbrev 000010e1  00000000  00000000  000256c3  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_aranges 000005d8  00000000  00000000  00026798  2**3
+ 14 .debug_aranges 000005d8  00000000  00000000  000267a8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_ranges 00000540  00000000  00000000  00026d70  2**3
+ 15 .debug_ranges 00000540  00000000  00000000  00026d80  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_macro  0001470d  00000000  00000000  000272b0  2**0
+ 16 .debug_macro  0001470d  00000000  00000000  000272c0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_line   00004f6a  00000000  00000000  0003b9bd  2**0
+ 17 .debug_line   00004f6c  00000000  00000000  0003b9cd  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    00080e54  00000000  00000000  00040927  2**0
+ 18 .debug_str    00080e67  00000000  00000000  00040939  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  000c177b  2**0
+ 19 .comment      0000007b  00000000  00000000  000c17a0  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000016bc  00000000  00000000  000c17f8  2**2
+ 20 .debug_frame  000016bc  00000000  00000000  000c181c  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -390,14 +390,14 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   //------------------------------------------------------
-   GPIO_PinState SwitchState[2];  //Now, Previous
+   GPIO_PinState SwitchStateS1[2];  //Now, Previous
    uint16_t LED1_Half_Period = 1000;  //Half of 0.5 Hz
  80004ee:	f44f 737a 	mov.w	r3, #1000	; 0x3e8
  80004f2:	81fb      	strh	r3, [r7, #14]
-   uint32_t TimeStamp = 0;	//
+   uint32_t TimeStamp_LED1 = 0;	//
  80004f4:	2300      	movs	r3, #0
  80004f6:	60bb      	str	r3, [r7, #8]
-   uint32_t ButtonTimeStamp = 0;
+   uint32_t ButtonTimeStampS1 = 0;
  80004f8:	2300      	movs	r3, #0
  80004fa:	607b      	str	r3, [r7, #4]
 
@@ -405,7 +405,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-   if(HAL_GetTick() - ButtonTimeStamp >= 100)
+   if(HAL_GetTick() - ButtonTimeStampS1 >= 100)
  80004fc:	f000 faa8 	bl	8000a50 <HAL_GetTick>
  8000500:	4602      	mov	r2, r0
  8000502:	687b      	ldr	r3, [r7, #4]
@@ -413,73 +413,74 @@ int main(void)
  8000506:	2b63      	cmp	r3, #99	; 0x63
  8000508:	d929      	bls.n	800055e <main+0x86>
    {
-    ButtonTimeStamp = HAL_GetTick();
+		ButtonTimeStampS1 = HAL_GetTick();
  800050a:	f000 faa1 	bl	8000a50 <HAL_GetTick>
  800050e:	6078      	str	r0, [r7, #4]
 
-    SwitchState[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
+		//	Task 1
+		SwitchStateS1[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
  8000510:	f44f 6180 	mov.w	r1, #1024	; 0x400
  8000514:	4822      	ldr	r0, [pc, #136]	; (80005a0 <main+0xc8>)
  8000516:	f000 fd0f 	bl	8000f38 <HAL_GPIO_ReadPin>
  800051a:	4603      	mov	r3, r0
  800051c:	703b      	strb	r3, [r7, #0]
-       //Press = Low , No = High
-       if(SwitchState[0] == GPIO_PIN_SET && SwitchState[1] == GPIO_PIN_RESET)
+		   //Press = Low , No = High
+		   if(SwitchStateS1[0] == GPIO_PIN_SET && SwitchStateS1[1] == GPIO_PIN_RESET)
  800051e:	783b      	ldrb	r3, [r7, #0]
  8000520:	2b01      	cmp	r3, #1
  8000522:	d11a      	bne.n	800055a <main+0x82>
  8000524:	787b      	ldrb	r3, [r7, #1]
  8000526:	2b00      	cmp	r3, #0
  8000528:	d117      	bne.n	800055a <main+0x82>
-       // set = high , reset = low
-       {
-        //Change Half Period of LED 1
-        if(LED1_Half_Period == 1000)
+		   // set = high , reset = low
+		   {
+				//Change Half Period of LED 1
+				if(LED1_Half_Period == 1000)
  800052a:	89fb      	ldrh	r3, [r7, #14]
  800052c:	f5b3 7f7a 	cmp.w	r3, #1000	; 0x3e8
  8000530:	d103      	bne.n	800053a <main+0x62>
-        {
-        	LED1_Half_Period = 500;	// 1 HZ
+				{
+					LED1_Half_Period = 500;	// 1 HZ
  8000532:	f44f 73fa 	mov.w	r3, #500	; 0x1f4
  8000536:	81fb      	strh	r3, [r7, #14]
  8000538:	e00f      	b.n	800055a <main+0x82>
-        }
-        else if (LED1_Half_Period == 500)
+				}
+				else if (LED1_Half_Period == 500)
  800053a:	89fb      	ldrh	r3, [r7, #14]
  800053c:	f5b3 7ffa 	cmp.w	r3, #500	; 0x1f4
  8000540:	d102      	bne.n	8000548 <main+0x70>
-        {
-        	LED1_Half_Period = 250;	// 2 HZ
+				{
+					LED1_Half_Period = 250;	// 2 HZ
  8000542:	23fa      	movs	r3, #250	; 0xfa
  8000544:	81fb      	strh	r3, [r7, #14]
  8000546:	e008      	b.n	800055a <main+0x82>
-		}
-        else if (LED1_Half_Period == 250)
+				}
+				else if (LED1_Half_Period == 250)
  8000548:	89fb      	ldrh	r3, [r7, #14]
  800054a:	2bfa      	cmp	r3, #250	; 0xfa
  800054c:	d102      	bne.n	8000554 <main+0x7c>
-        {
-        	LED1_Half_Period = (1000/6);	// 3 HZ
+				{
+					LED1_Half_Period = (1000/6);	// 3 HZ
  800054e:	23a6      	movs	r3, #166	; 0xa6
  8000550:	81fb      	strh	r3, [r7, #14]
  8000552:	e002      	b.n	800055a <main+0x82>
-		}
-        else
-        {
-         LED1_Half_Period = 1000;	// 0.5 HZ
+				}
+				else
+				{
+				 LED1_Half_Period = 1000;	// 0.5 HZ
  8000554:	f44f 737a 	mov.w	r3, #1000	; 0x3e8
  8000558:	81fb      	strh	r3, [r7, #14]
-        }
-       }
-       SwitchState[1] = SwitchState[0];
+				}
+		   }
+		   SwitchStateS1[1] = SwitchStateS1[0];
  800055a:	783b      	ldrb	r3, [r7, #0]
  800055c:	707b      	strb	r3, [r7, #1]
    }
 
 
 
-   //Run LED
-   if(HAL_GetTick() - TimeStamp >= LED1_Half_Period) //millisecond now time
+   //Run LED for Task 1
+   if(HAL_GetTick() - TimeStamp_LED1 >= LED1_Half_Period) //millisecond now time
  800055e:	f000 fa77 	bl	8000a50 <HAL_GetTick>
  8000562:	4602      	mov	r2, r0
  8000564:	68bb      	ldr	r3, [r7, #8]
@@ -488,32 +489,32 @@ int main(void)
  800056a:	429a      	cmp	r2, r3
  800056c:	d3c6      	bcc.n	80004fc <main+0x24>
    {
-    TimeStamp = HAL_GetTick();
+		TimeStamp_LED1 = HAL_GetTick();
  800056e:	f000 fa6f 	bl	8000a50 <HAL_GetTick>
  8000572:	60b8      	str	r0, [r7, #8]
-    if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET)
+		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET)
  8000574:	f44f 7100 	mov.w	r1, #512	; 0x200
  8000578:	4809      	ldr	r0, [pc, #36]	; (80005a0 <main+0xc8>)
  800057a:	f000 fcdd 	bl	8000f38 <HAL_GPIO_ReadPin>
  800057e:	4603      	mov	r3, r0
  8000580:	2b01      	cmp	r3, #1
  8000582:	d106      	bne.n	8000592 <main+0xba>
-    {
-     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+		{
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
  8000584:	2200      	movs	r2, #0
  8000586:	f44f 7100 	mov.w	r1, #512	; 0x200
  800058a:	4805      	ldr	r0, [pc, #20]	; (80005a0 <main+0xc8>)
  800058c:	f000 fcec 	bl	8000f68 <HAL_GPIO_WritePin>
  8000590:	e7b4      	b.n	80004fc <main+0x24>
-    }
-    else
-    {
-     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+		}
+		else
+		{
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
  8000592:	2201      	movs	r2, #1
  8000594:	f44f 7100 	mov.w	r1, #512	; 0x200
  8000598:	4801      	ldr	r0, [pc, #4]	; (80005a0 <main+0xc8>)
  800059a:	f000 fce5 	bl	8000f68 <HAL_GPIO_WritePin>
-   if(HAL_GetTick() - ButtonTimeStamp >= 100)
+   if(HAL_GetTick() - ButtonTimeStampS1 >= 100)
  800059e:	e7ad      	b.n	80004fc <main+0x24>
  80005a0:	40020000 	.word	0x40020000
 
