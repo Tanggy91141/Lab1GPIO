@@ -91,22 +91,28 @@ int main(void)
 
 
   /* USER CODE BEGIN 2 */
-  //------------------------------------------------------
+  // Task 1
    GPIO_PinState SwitchStateS1[2];  //Now, Previous
    uint16_t LED1_Half_Period = 1000;  //Half of 0.5 Hz
    uint32_t TimeStamp_LED1 = 0;	//
-   uint32_t ButtonTimeStampS1 = 0;
+   uint32_t ButtonTimeStamp = 0;
 
-  //------------------------------------------------------
+  // Task 2
+   GPIO_PinState SwitchStateS2[2];  //Now, Previous
+   uint8_t LED3_On = 0;	//LED3 is on ; The default is false.
+   	   	   //uint16_t LED3_Half_Period = 1000;  //Half of 0.5 Hz
+   	   	   //uint32_t TimeStamp_LED3 = 0;	//
+   	   	   //uint32_t ButtonTimeStampS2 = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-   if(HAL_GetTick() - ButtonTimeStampS1 >= 100)
+   if(HAL_GetTick() - ButtonTimeStamp >= 100)
    {
-		ButtonTimeStampS1 = HAL_GetTick();
+		ButtonTimeStamp = HAL_GetTick();
 
 		//	Task 1
 		SwitchStateS1[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
@@ -134,9 +140,22 @@ int main(void)
 		   }
 		   SwitchStateS1[1] = SwitchStateS1[0];
 
-		 //	Task 2
-
-
+		//	Task 2
+		SwitchStateS2[0] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
+		   //Press = Low , No = High
+		   if(SwitchStateS2[0] == GPIO_PIN_SET && SwitchStateS2[1] == GPIO_PIN_RESET)
+		   // set = high , reset = low
+		   {
+			   if (LED3_On == 0)
+			   {
+				   LED3_On = 1;	// On
+			   }
+			   else
+			   {
+				   LED3_On = 0;	// Off
+			   }
+		   }
+		   SwitchStateS2[1] = SwitchStateS2[0];
    }
 
 
@@ -154,6 +173,17 @@ int main(void)
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
 		}
    }
+
+   //Run LED for Task 2
+   if (LED3_On == 0)
+   {
+	   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+   }
+   else
+   {
+	   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+   }
+
 
 
 
