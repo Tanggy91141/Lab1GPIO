@@ -88,8 +88,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-
-
   /* USER CODE BEGIN 2 */
   // Task 1
    GPIO_PinState SwitchStateS1[2];  //Now, Previous
@@ -99,7 +97,8 @@ int main(void)
 
   // Task 2
    GPIO_PinState SwitchStateS2[2];  //Now, Previous
-   uint8_t LED3_On = 0;	//LED3 is on ; The default is false.
+   uint32_t LED3_On = 0;	//LED3 is on ; The default is false.
+
    	   	   //uint16_t LED3_Half_Period = 1000;  //Half of 0.5 Hz
    	   	   //uint32_t TimeStamp_LED3 = 0;	//
    	   	   //uint32_t ButtonTimeStampS2 = 0;
@@ -146,6 +145,7 @@ int main(void)
 		   if(SwitchStateS2[0] == GPIO_PIN_SET && SwitchStateS2[1] == GPIO_PIN_RESET)
 		   // set = high , reset = low
 		   {
+			   //if (LED3_On == 0)
 			   if (LED3_On == 0)
 			   {
 				   LED3_On = 1;	// On
@@ -154,6 +154,8 @@ int main(void)
 			   {
 				   LED3_On = 0;	// Off
 			   }
+
+
 		   }
 		   SwitchStateS2[1] = SwitchStateS2[0];
    }
@@ -188,6 +190,7 @@ int main(void)
 
 
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -288,6 +291,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LD2_Pin|GPIO_PIN_9, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
@@ -301,11 +307,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PC7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
   /*Configure GPIO pin : PA10 */
   GPIO_InitStruct.Pin = GPIO_PIN_10;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
