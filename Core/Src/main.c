@@ -138,7 +138,7 @@ int main(void)
 				}
 				else
 				{
-				 LED1_Half_Period = 1000;	// 0.5 HZ
+					LED1_Half_Period = 1000;	// 0.5 HZ
 				}
 		   }
 		   SwitchStateS1[1] = SwitchStateS1[0];
